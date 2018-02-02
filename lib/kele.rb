@@ -36,10 +36,7 @@ class Kele
       response = self.class.get(url, headers: { "authorization" => @auth_token })
       jResponse = JSON.parse(response.to_s)
 
-       jResponse["items"].each do |item|
-         puts "message!:"
-         puts item["id"]
-       end
+
 
        return nil;
     end
@@ -48,14 +45,17 @@ class Kele
       url = 'https://www.bloc.io/api/v1/messages'
 
       values = {
-        "sender" => "mpkelley08@gmail.com",
-        "recipient_id" => r_id,
-        "subject" => subject,
-        "stripped-text" => text
+        headers: { "authorization" => @auth_token },
+        body:{
+          "sender" => "mpkelley08@gmail.com",
+          "recipient_id" => r_id,
+          "subject" => subject,
+          "stripped-text" => text
+        }
       }
 
       #response = self.class.post(url, values)
-      response = self.class.post(url, values, "headers" => { "authorization" => @auth_token })
+      response = self.class.post(url, values)
 
       puts response.body, response.code, response.message
 
