@@ -4,6 +4,8 @@ require 'json'
 class Kele
   include HTTParty
     @auth_token
+    @id
+    @mentor_id
 
     def initialize(email, password)
       url  = 'https://www.bloc.io/api/v1/sessions'
@@ -17,7 +19,6 @@ class Kele
 
     end
 
-
     def get_me
       url  = 'https://www.bloc.io/api/v1/users/me'
       response = self.class.get(url, headers: { "authorization" => @auth_token })
@@ -28,7 +29,17 @@ class Kele
 
       #I'm assuming the httparty parsed_response method is the same thing, but if not:
       jResponse = JSON.parse(response.to_s)
-      puts jResponse["first_name"]
+      @mentor_id = jResponse["current_enrollment"]["mentor_id"]
+
     end
+
+
+    def get_mentor_availability
+      url = "https://www.bloc.io/api/v1/mentors#{@mentor_id}/student_availability"
+      response = self.class.get(url, headers: { "content_type" => 'application/json', "authorization" => @auth_token })
+      puts response.body, response.code, response.message
+
+    end
+
 
 end
