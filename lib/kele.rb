@@ -31,14 +31,23 @@ class Kele
       puts jResponse["first_name"]
     end
 
-    def get_messages
+    def get_messages(page = nil)
       url  = 'https://www.bloc.io/api/v1/message_threads'
-      response = self.class.get(url, headers: { "authorization" => @auth_token })
+      page ||= nil
+      values = {
+        headers: { "authorization" => @auth_token },
+        body:{
+          "page" => page
+        }
+      }
+
+      if page
+        response = self.class.get(url, values)
+      else
+        response = self.class.get(url, headers: { "authorization" => @auth_token })
+      end
       jResponse = JSON.parse(response.to_s)
 
-
-
-       return nil;
     end
 
     def create_message (r_id, subject, text )
@@ -54,12 +63,8 @@ class Kele
         }
       }
 
-      #response = self.class.post(url, values)
       response = self.class.post(url, values)
-
-      puts response.body, response.code, response.message
-
-
+      jResponse = JSON.parse(response.to_s)
 
     end
 
