@@ -29,12 +29,46 @@ class Kele
       response = self.class.get(url, headers: { "content_type" => 'application/json', "authorization" => @auth_token })
       jResponse = JSON.parse(response.to_s)
       @mentor_availability = jResponse
-      
+
     end
 
 
+    def get_messages(page = nil)
+      url  = 'https://www.bloc.io/api/v1/message_threads'
+      page ||= nil
+      values = {
+        headers: { "authorization" => @auth_token },
+        body:{
+          "page" => page
+        }
+      }
 
+      if page
+        response = self.class.get(url, values)
+      else
+        response = self.class.get(url, headers: { "authorization" => @auth_token })
+      end
+      jResponse = JSON.parse(response.to_s)
 
+    end
+
+    def create_message (r_id, subject, text )
+      url = 'https://www.bloc.io/api/v1/messages'
+
+      values = {
+        headers: { "authorization" => @auth_token },
+        body:{
+          "sender" => "mpkelley08@gmail.com",
+          "recipient_id" => r_id,
+          "subject" => subject,
+          "stripped-text" => text
+        }
+      }
+
+      response = self.class.post(url, values)
+      jResponse = JSON.parse(response.to_s)
+
+    end
 
 
 end
