@@ -29,6 +29,7 @@ class Kele
       response = self.class.get(url, headers: { "content_type" => 'application/json', "authorization" => @auth_token })
       jResponse = JSON.parse(response.to_s)
       @mentor_availability = jResponse
+      
     end
 
 
