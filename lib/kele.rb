@@ -11,15 +11,17 @@ class Kele
       url  = 'https://www.bloc.io/api/v1/sessions'
       response = self.class.post(url, body: {"email" => email, "password" => password})
       @auth_token = response.parsed_response["auth_token"]
+
       puts "code: #{response.code} message: #{response.parsed_response["message"]}" unless response.code === 200
     end
 
     def get_me
       url  = 'https://www.bloc.io/api/v1/users/me'
       response = self.class.get(url, headers: { "authorization" => @auth_token })
-      jResponse = JSON.parse(response.to_s)
-      @mentor_id = jResponse["current_enrollment"]["mentor_id"]
-      
+      j_response = JSON.parse(response.to_s)
+
+      @mentor_id = j_response["current_enrollment"]["mentor_id"]
+
     end
 
 
@@ -27,7 +29,7 @@ class Kele
       mentor_id ||= @mentor_id
       url = "https://www.bloc.io/api/v1/mentors/#{mentor_id}/student_availability"
       response = self.class.get(url, headers: { "content_type" => 'application/json', "authorization" => @auth_token })
-      jResponse = JSON.parse(response.to_s)
+      j_response = JSON.parse(response.to_s)
 
     end
 
@@ -47,7 +49,7 @@ class Kele
       else
         response = self.class.get(url, headers: { "authorization" => @auth_token })
       end
-      jResponse = JSON.parse(response.to_s)
+      j_response = JSON.parse(response.to_s)
 
     end
 
@@ -64,7 +66,27 @@ class Kele
         }
       }
       response = self.class.post(url, values)
-      jResponse = JSON.parse(response.to_s)
+      j_response = JSON.parse(response.to_s)
+
+    end
+
+
+    def create_submission(checkpoint_id, enrollment_id, assignment_branch, assignment_commit_link, comment)
+      values = {
+        headers: { "authorization" => @auth_token },
+        body:{
+          "checkpoint_id" => checkpoint_id,
+          "enrollment_id" => enrollment_id,
+          "assignment_branch" => assignment_branch,
+          "assignment_commit_link" => assignment_commit_link,
+          "comment" => comment
+        }
+      }
+
+      url = 'https://www.bloc.io/api/v1/checkpoint_submissions'
+      response = self.class.post(url, values)
+      
+      j_response = JSON.parse(response.to_s)
 
     end
 
