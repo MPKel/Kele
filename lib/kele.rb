@@ -5,10 +5,11 @@ require_relative 'roadmap'
 class Kele
   include HTTParty
   include Roadmap
+  API_URL = 'https://www.bloc.io/api/v1/'
 
 
     def initialize(email, password)
-      url  = 'https://www.bloc.io/api/v1/sessions'
+      url  = "#{API_URL}sessions"
       response = self.class.post(url, body: {"email" => email, "password" => password})
       @auth_token = response.parsed_response["auth_token"]
 
@@ -16,26 +17,30 @@ class Kele
     end
 
     def get_me
-      url  = 'https://www.bloc.io/api/v1/users/me'
+
+      url  = "#{API_URL}users/me"
       response = self.class.get(url, headers: { "authorization" => @auth_token })
       j_response = JSON.parse(response.to_s)
 
       @mentor_id = j_response["current_enrollment"]["mentor_id"]
+      @enrollment_id = j_response["current_enrollment"]["id"]
 
     end
 
 
     def get_mentor_availability(mentor_id = nil)
       mentor_id ||= @mentor_id
-      url = "https://www.bloc.io/api/v1/mentors/#{mentor_id}/student_availability"
+      url  = "#{API_URL}mentors/#{mentor_id}/student_availability"
       response = self.class.get(url, headers: { "content_type" => 'application/json', "authorization" => @auth_token })
       j_response = JSON.parse(response.to_s)
+
+
 
     end
 
 
     def get_messages(page = nil)
-      url  = 'https://www.bloc.io/api/v1/message_threads'
+      url  = "#{API_URL}message_threads"
       page ||= nil
       values = {
         headers: { "authorization" => @auth_token },
@@ -54,7 +59,7 @@ class Kele
     end
 
     def create_message (r_id, subject, text )
-      url = 'https://www.bloc.io/api/v1/messages'
+      url  = "#{API_URL}messages"
 
       values = {
         headers: { "authorization" => @auth_token },
@@ -71,21 +76,21 @@ class Kele
     end
 
 
-    def create_submission(checkpoint_id, enrollment_id, assignment_branch, assignment_commit_link, comment)
+    def create_submission(checkpoint_id, assignment_branch, assignment_commit_link, comment)
       values = {
         headers: { "authorization" => @auth_token },
         body:{
           "checkpoint_id" => checkpoint_id,
-          "enrollment_id" => enrollment_id,
+          "enrollment_id" => @enrollment_id,
           "assignment_branch" => assignment_branch,
           "assignment_commit_link" => assignment_commit_link,
           "comment" => comment
         }
       }
 
-      url = 'https://www.bloc.io/api/v1/checkpoint_submissions'
+      url  = "#{API_URL}checkpoint_submissions"
       response = self.class.post(url, values)
-      
+
       j_response = JSON.parse(response.to_s)
 
     end
